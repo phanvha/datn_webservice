@@ -1,9 +1,6 @@
-import re
 # from tensorflow.keras.preprocessing import image
-from constant import STATUS_CODE
 from database.mNews import News
 from database.mUser import User
-from utils.fcm_notifier import send_fcm
 from flask import Flask, make_response, jsonify, render_template
 from flask_cors import CORS, cross_origin
 from flask import request, Response
@@ -18,14 +15,11 @@ import numpy as np
 import cv2 as cv
 import base64
 import string, random
-import json
 import tensorflow as tf
 import os
-import math
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 from config import URL
-from PIL import Image
 from werkzeug.utils import redirect, secure_filename  
 from datetime import datetime
 from database.mPothole import Pothole
@@ -92,12 +86,12 @@ def detectPothole(img):
     print(CATEGORIES[prediction.argmax()])
     return CATEGORIES[prediction.argmax()]
 
-@app.route('/', methods=['GET'] )
+@app.route('/')
 def home():
-    return redirect(url_for('index'))
+    return redirect('index')
 
 
-@app.route('/index', methods=['GET'] )
+@app.route('/dashboard', methods=['GET'] )
 def index():
     try:
         tracking  = Tracking.objects
@@ -113,14 +107,14 @@ def mapsview():
 
         # redirect to end the POST handling
         # the redirect can be to the same route or somewhere else
-        return redirect(url_for('index'))
+        return redirect('index')
 
     # show the form, it wasn't submitted
     return render_template('maps.html')
 
 @app.before_first_request
 def load_model_to_app():
-    app.predictor = load_model('model/detectpt.model')
+    app.predictor = tf.keras.models.load_model('model/detectpt.model')
 
 #api nhận dạng ổ gà
 @app.route('/api/pothole/detect', methods=['POST'] )
