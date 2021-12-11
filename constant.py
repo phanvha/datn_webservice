@@ -9,6 +9,7 @@ STATUS_CODE = {
     "PR-00000003" : "Sự cố dịch vụ! \nVui lòng đợi trong giây lát!",
     "PR-00000004" : "Không thể lấy dữ liệu!",
     "PR-00000005" : "Hình ảnh không được để trống!",
+    
 
 }
 
