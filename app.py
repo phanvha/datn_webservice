@@ -5,12 +5,10 @@ from flask import Flask, make_response, jsonify, render_template
 from flask_cors import CORS, cross_origin
 from flask import request, Response
 from flask_mongoengine import MongoEngine
-from tensorflow.keras import backend
 # from tensorflow.keras.model import load_model
 # from tensorflow.keras.preprocessing.image import load_img, img_to_array 
 
 # from flask_ngrok import run_with_ngrok
-import pandas as pd
 import numpy as np
 import cv2 as cv
 import base64
@@ -25,9 +23,6 @@ from datetime import datetime
 from database.mPothole import Pothole
 from database.mTracking import Tracking
 from utils.convert_image import reUpImage, base64_to_image, image_to_base64, getType, getSize
-
-import firebase_admin
-from firebase_admin import credentials, messaging
 
 # cred = credentials.Certificate("data/json/serviceAccountKey.json")
 # firebase_admin.initialize_app(cred)
@@ -73,6 +68,7 @@ CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 CATEGORIES = [0, 1]
 ALLOWED_EXTENSIONS = set(['png','jpg', 'jpeg', 'gif'])
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 
 def id_generator(size=12, chars=string.ascii_uppercase + string.digits):
@@ -88,7 +84,7 @@ def detectPothole(img):
 
 @app.route('/')
 def home():
-    return redirect('index')
+    return redirect('dashboard')
 
 
 @app.route('/dashboard', methods=['GET'] )
