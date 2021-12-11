@@ -1,5 +1,5 @@
 import re
-from tensorflow.keras.preprocessing import image
+# from tensorflow.keras.preprocessing import image
 from constant import STATUS_CODE
 from database.mNews import News
 from database.mUser import User
@@ -9,8 +9,8 @@ from flask_cors import CORS, cross_origin
 from flask import request, Response
 from flask_mongoengine import MongoEngine
 from tensorflow.keras import backend
-from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing.image import load_img, img_to_array 
+# from tensorflow.keras.model import load_model
+# from tensorflow.keras.preprocessing.image import load_img, img_to_array 
 
 # from flask_ngrok import run_with_ngrok
 import pandas as pd
@@ -87,7 +87,7 @@ def id_generator(size=12, chars=string.ascii_uppercase + string.digits):
 #nhận dạng ổ gà
 def detectPothole(img):
     #load model
-    model = load_model('model/detectpt.model')
+    model = tf.keras.models.load_model('model/detectpt.model')
     prediction = model.predict([img])
     print(CATEGORIES[prediction.argmax()])
     return CATEGORIES[prediction.argmax()]
