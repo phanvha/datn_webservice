@@ -207,7 +207,8 @@ def create_pothole():
         ran = ''.join(random.choices(string.ascii_uppercase + string.digits, k = 7))    
         mimeType = img.content_type
         mimeType = getType(mimeType)
-        filename = str(mimeType)+'_'+str(date)+"_"+str(ran)+'_'+img.filename
+        # filename = str(mimeType)+'_'+str(date)+"_"+str(ran)+'_'+img.filename
+        filename = img.filename
         img_path = os.path.join(save_father_path, filename)
         # if getSize(img):
         #     print("bbc")
@@ -244,6 +245,7 @@ def create_pothole():
             return make_response(jsonify({
                 'status': True,
                 'code' : 200,
+                'status_code': 'PR-00000000',
                 'message': 'Tạo dữ liệu thành công!',
                 'object' : response
                 
@@ -261,7 +263,7 @@ def create_pothole():
 
 @app.route('/api/v1/potholes', methods=['GET', 'POST'] )
 @cross_origin(origin='*')
-def _api():
+def api():
     try:
         if request.method == 'GET':
             potholes = []
