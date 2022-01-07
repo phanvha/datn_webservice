@@ -4,7 +4,7 @@
 	<title>ATPro Admin</title>
 
 	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
-	<link rel="icon" type="image/png" href="static/assets/AT-pro-logo.png"/>
+	<link rel="icon" type="image/png" href="static/assets/logo.png"/>
 
 	<!-- Import lib -->
 	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.css">
@@ -25,8 +25,8 @@
 				</a>
 			</li>
 			<li class="nav-item">
-				<img src="{{ url_for('static',filename='assets/AT-pro-black.png')}}" alt="ATPro logo" class="logo logo-light">
-				<img src="{{ url_for('static',filename='assets/AT-pro-white.png')}}" alt="ATPro logo" class="logo logo-dark">
+				<img src="{{ url_for('static',filename='assets/logo.png')}}" alt="logo" class="logo logo-light">
+				<img src="{{ url_for('static',filename='assets/logo.png')}}" alt="logo" class="logo logo-dark">
 			</li>
 		</ul>
 		<!-- end nav left -->
@@ -134,7 +134,7 @@
 	<div class="sidebar">
 		<ul class="sidebar-nav">
 			<li class="sidebar-nav-item">
-				<a href="#" class="sidebar-nav-link">
+				<a href="{{ url_for('home') }}" class="sidebar-nav-link">
 					<div>
 						<i class="fas fa-tachometer-alt"></i>
 					</div>
@@ -144,7 +144,7 @@
 				</a>
 			</li>
 			<li class="sidebar-nav-item">
-				<a href="{{ url_for('index') }}" class="sidebar-nav-link">
+				<a href="{{ url_for('home') }}" class="sidebar-nav-link">
 					<div>
 						<i class="fab fa-accusoft"></i>
 					</div>

@@ -1,6 +1,5 @@
 # from tensorflow.keras.preprocessing import image
-from database.mNews import News
-from database.mUser import User
+
 from flask import Flask, make_response, jsonify, render_template
 from flask_cors import CORS, cross_origin
 from flask import request, Response
@@ -22,6 +21,11 @@ from werkzeug.utils import redirect, secure_filename
 from datetime import datetime
 from database.mPothole import Pothole
 from database.mTracking import Tracking
+from database.mNotification import Notifications
+from database.mSharingHistory import SharingHistory
+from database.mSignalHistory import SignalHistory
+from database.mNews import News
+from database.mUser import User
 from utils.convert_image import reUpImage, base64_to_image, image_to_base64, getType, getSize
 
 # cred = credentials.Certificate("data/json/serviceAccountKey.json")
@@ -178,7 +182,7 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 #create new pothole
-@app.route('/api/create-pothole', methods=['POST'] )
+@app.route('/api/pothole/create-pothole', methods=['POST'] )
 @cross_origin(origin='*')
 def create_pothole():
     ran = ''.join(random.choices(string.ascii_uppercase + string.digits, k = 17)) 
@@ -187,7 +191,7 @@ def create_pothole():
     latitude = request.form.get('latitude')
     longitude = request.form.get('longitude')
     note = request.form.get('note')
-    addres = request.form.get('address')
+    address = request.form.get('address')
     img = request.files['image']
     timestamp = str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
@@ -218,14 +222,14 @@ def create_pothole():
             os.makedirs(save_father_path)
         img.save(img_path)
         result = detectPothole(reUpImage(img_path))
-        
+        print(result);
         if result == 1:
             pothole1 = Pothole(
                 _id             = _id,
                 email           = email,
                 latitude        = latitude,
                 longitude       = longitude,
-                address         = addres,
+                address         = address,
                 note            = note,
                 image_url       = filename,
                 timestamp       = timestamp
@@ -247,7 +251,7 @@ def create_pothole():
                 'code' : 200,
                 'status_code': 'PR-00000000',
                 'message': 'Tạo dữ liệu thành công!',
-                'object' : response
+                'data' : response
                 
             }),200)
         else:
@@ -297,12 +301,10 @@ def api():
         return make_response(jsonify(
                 {
                     'status': True,
-                    'code': 200,
+                    'code': 401,
                     'status_code': "PR-00000004",
                     'message': "Không thể lấy dữ liệu!",
                 }),401)
-
-
    
 
 @app.route('/api/potholes/<_id>', methods=['GET','POST','DELETE'])
@@ -332,7 +334,7 @@ def api_each_potholes(_id):
 
         return make_response("ok", 200)
     
-@app.route('/api/potholes/<_id>/delete', methods=['POST'])
+@app.route('/api/v1/potholes/<_id>/delete', methods=['POST'])
 @cross_origin(origin='*')
 def api_delete(_id):
     obj = Pothole.objects(_id=_id).first()
@@ -342,13 +344,14 @@ def api_delete(_id):
 
 
 # tracking user location
-@app.route('/api/pothole/tracking', methods=['POST'])
+@app.route('/api/v1/pothole/tracking', methods=['POST'])
 @cross_origin(origin='*')
 def tracking():
-    ran = ''.join(random.choices(string.ascii_uppercase + string.digits, k = 17)) 
-    _id = str(ran)
-    latitude = request.form.get('latitude')
-    longitude = request.form.get('longitude')
+    date = str(datetime.now())
+
+    latitude = request.json.get('latitude')
+    longitude = request.json.get('longitude')
+    _id = base64.b64encode(bytes(str(latitude)+","+str(longitude)+","+date, 'utf-8'))
     timestamp = str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     pot = Tracking(
         _id         = _id,
@@ -360,13 +363,14 @@ def tracking():
     return make_response(jsonify(
         {
             'status': True,
-            'code': 200,
-            'message': "OK",
+            'code': 201,
+            'status_code': "PR-00000000",
+            'message': "Upload thành công!",
             'data': [pot]
         }
         ), 201)
-# news
-@app.route('/api/news/add', methods=['POST'])
+# create news
+@app.route('/api/v1/news/add', methods=['POST'])
 @cross_origin(origin='*')
 def add_news():
     ran = ''.join(random.choices(string.ascii_uppercase + string.digits, k = 17)) 
@@ -387,15 +391,25 @@ def add_news():
     return make_response(jsonify(
         {
             'status': True,
-            'code': 200,
+            'code': 201,
             'message': "OK",
             'data': [pot]
         }
         ), 201)
-
-@app.route('/api/news/get', methods=['GET', 'POST'] )
+# get list news
+@app.route('/api/v1/news/get-all', methods=['GET'] )
 @cross_origin(origin='*')
-def get_news():
+def get_news_all():
+    if request.method == 'GET':
+        news = []
+        for pot in News.objects:
+            news.append(pot)
+        
+        return make_response(jsonify(news),200)
+# get list notification
+@app.route('/api/v1/notification/get-all', methods=['GET', 'POST'] )
+@cross_origin(origin='*')
+def get_notification_all():
     if request.method == 'GET':
         news = []
         for pot in News.objects:
@@ -404,8 +418,8 @@ def get_news():
         return make_response(jsonify(news),200)
 
 
-
-@app.route('/api/user/add', methods=['POST'])
+""" add user """
+@app.route('/api/v1/user/add', methods=['POST'])
 @cross_origin(origin='*')
 def create_user():
     ran = ''.join(random.choices(string.ascii_uppercase + string.digits, k = 17)) 
@@ -464,7 +478,7 @@ def create_user():
         }
         ), 201)
 
-@app.route('/api/user/login', methods=['POST'] )
+@app.route('/api/v1/user/login', methods=['POST'] )
 @cross_origin(origin='*')
 def user_login():
     
